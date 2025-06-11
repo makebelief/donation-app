@@ -2,9 +2,28 @@ import { error, type Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import jwt from 'jsonwebtoken';
 import type { RequestEvent } from '@sveltejs/kit';
-import { getDb } from '$lib/server/database';
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
+const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+
+export async function validateCredentials(email: string, password: string) {
+  const user = await prisma.user.findUnique({
+    where: { email }
+  });
+
+  if (!user) {
+    throw error(401, 'Invalid credentials');
+  }
+
+  const isValid = await bcrypt.compare(password, user.password);
+  if (!isValid) {
+    throw error(401, 'Invalid credentials');
+  }
+
+  return user;
+}
 
 export async function validateAdmin(event: RequestEvent) {
   const token = event.cookies.get('admin_token');
@@ -15,11 +34,10 @@ export async function validateAdmin(event: RequestEvent) {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
-    const db = await getDb();
-    const user = await db.get(
-      'SELECT id, email, role FROM users WHERE id = ?',
-      decoded.userId
-    );
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: { id: true, email: true, role: true }
+    });
 
     if (!user || user.role !== 'ADMIN') {
       throw error(403, 'Forbidden');
@@ -55,11 +73,10 @@ export const authenticateAdmin: Handle = async ({ event, resolve }) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
-    const db = await getDb();
-    const user = await db.get(
-      'SELECT id, email, role FROM users WHERE id = ?',
-      decoded.userId
-    );
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: { id: true, email: true, role: true }
+    });
 
     if (!user || user.role !== 'ADMIN') {
       event.cookies.delete('admin_token', { path: '/' });
