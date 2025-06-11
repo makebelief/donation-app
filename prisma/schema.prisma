@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:../data/donation.db"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  role      String   @default("USER") // "USER", "ADMIN", or "MODERATOR"
+  phone     String?
+  status    String   @default("ACTIVE") // "ACTIVE", "INACTIVE", or "SUSPENDED"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  donations Donation[]
+}
+
+model Project {
+  id                  String   @id @default(cuid())
+  title              String
+  description        String
+  goal               Float
+  imageUrl           String?
+  location           String
+  startDate          DateTime
+  endDate            DateTime
+  impactMetric       String
+  targetBeneficiaries Int
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  donations          Donation[]
+}
+
+model Donation {
+  id            String   @id @default(cuid())
+  amount        Float
+  status        String   @default("PENDING") // "PENDING", "COMPLETED", or "FAILED"
+  date          DateTime @default(now())
+  transactionId String?
+  paymentMethod String
+  notes         String?
+  donor         User     @relation(fields: [donorId], references: [id])
+  donorId       String
+  project       Project  @relation(fields: [projectId], references: [id])
+  projectId     String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model SiteSettings {
+  id            Int      @id @default(1)
+  siteName      String   @default("Donate")
+  description   String   @default("Empowering change through transparent and impactful donations")
+  contactEmail  String   @default("")
+  supportPhone  String   @default("")
+  address       String   @default("")
+  currency      String   @default("KES")
+  minDonation   Float    @default(100)
+  mpesaPaybill  String   @default("")
+  stripePublicKey String @default("")
+  stripeSecretKey String @default("")
+  emailNotifications Boolean @default(true)
+  smsNotifications Boolean @default(false)
+  adminEmails   String   @default("[]") // JSON string array
+  newDonationAlert Boolean @default(true)
+  projectUpdateAlert Boolean @default(true)
+  monthlyReportEnabled Boolean @default(true)
+  facebook      String   @default("")
+  twitter       String   @default("")
+  instagram     String   @default("")
+  linkedin      String   @default("")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+} 
