@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/node"
+    }
+  ],
+  "env": {
+    "POSTGRES_PRISMA_URL": "env var will be set in Vercel dashboard",
+    "POSTGRES_URL_NON_POOLING": "env var will be set in Vercel dashboard"
+  }
+} 
