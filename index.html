@@ -5,18 +5,36 @@
 		<link rel="icon" href="/donation-app/favicon.png" />
 		<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script>
+			(function(l) {
+				if (l.search) {
+					var q = {};
+					l.search.slice(1).split('&').forEach(function(v) {
+						var a = v.split('=');
+						q[a[0]] = a.slice(1).join('=').replace(/~and~/g, '&');
+					});
+					if (q.p) {
+						window.history.replaceState(null, null,
+							l.pathname.slice(0, -1) + (q.p || '') +
+							(q.q ? ('?' + q.q) : '') +
+							l.hash
+						);
+					}
+				}
+			}(window.location))
+		</script>
 		
-		<link rel="modulepreload" href="/donation-app/_app/immutable/entry/start.mLwvIRDa.js">
-		<link rel="modulepreload" href="/donation-app/_app/immutable/chunks/D0Z6Z9IO.js">
+		<link rel="modulepreload" href="/donation-app/_app/immutable/entry/start.DpvPkc4v.js">
+		<link rel="modulepreload" href="/donation-app/_app/immutable/chunks/C2YtLLUX.js">
 		<link rel="modulepreload" href="/donation-app/_app/immutable/chunks/BUL126xa.js">
-		<link rel="modulepreload" href="/donation-app/_app/immutable/entry/app.cuUPVRc5.js">
+		<link rel="modulepreload" href="/donation-app/_app/immutable/entry/app.Vi0paXPK.js">
 		<link rel="modulepreload" href="/donation-app/_app/immutable/chunks/IHki7fMi.js">
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div style="display: contents">
 			<script>
 				{
-					__sveltekit_1dv2188 = {
+					__sveltekit_m8qyhd = {
 						base: "/donation-app",
 						assets: "/donation-app"
 					};
@@ -24,8 +42,8 @@
 					const element = document.currentScript.parentElement;
 
 					Promise.all([
-						import("/donation-app/_app/immutable/entry/start.mLwvIRDa.js"),
-						import("/donation-app/_app/immutable/entry/app.cuUPVRc5.js")
+						import("/donation-app/_app/immutable/entry/start.DpvPkc4v.js"),
+						import("/donation-app/_app/immutable/entry/app.Vi0paXPK.js")
 					]).then(([kit, app]) => {
 						kit.start(app, element);
 					});
