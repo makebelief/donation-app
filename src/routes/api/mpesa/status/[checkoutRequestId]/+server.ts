@@ -1,27 +1,37 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from '@sveltejs/kit';
-import { db } from '$lib/server/database';
+import { getDb } from '$lib/server/database';
 
 export const GET: RequestHandler = async ({ params }) => {
+  const db = await getDb();
   try {
     const { checkoutRequestId } = params;
+    
+    const donation = await db.get(
+      `SELECT * FROM donations WHERE mpesa_checkout_id = ?`,
+      [checkoutRequestId]
+    );
 
-    const paymentRequest = db.prepare(`
-      SELECT status, error_message 
-      FROM payment_requests 
-      WHERE checkout_request_id = ?
-    `).get(checkoutRequestId);
-
-    if (!paymentRequest) {
-      return json({ error: 'Payment request not found' }, { status: 404 });
+    if (!donation) {
+      return json({ 
+        status: 'NOT_FOUND',
+        message: 'Payment request not found'
+      }, { status: 404 });
     }
 
     return json({
-      status: paymentRequest.status,
-      error: paymentRequest.error_message
+      status: donation.status,
+      message: donation.status === 'COMPLETED' 
+        ? 'Payment completed successfully'
+        : donation.status === 'FAILED'
+        ? 'Payment failed'
+        : 'Payment pending'
     });
   } catch (error) {
-    console.error('Payment status check error:', error);
-    return json({ error: 'Failed to check payment status' }, { status: 500 });
+    console.error('Error checking payment status:', error);
+    return json({ 
+      status: 'ERROR',
+      message: 'Failed to check payment status'
+    }, { status: 500 });
   }
 }; 

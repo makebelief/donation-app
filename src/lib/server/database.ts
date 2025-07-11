@@ -5,10 +5,10 @@ import { dirname, join } from 'path';
 import sqlite3 from 'sqlite3';
 import { open, type Database } from 'sqlite';
 
-let db: Database | null = null;
+let dbInstance: Database | null = null;
 
 async function initializeDatabase(): Promise<Database> {
-  if (db) return db;
+  if (dbInstance) return dbInstance;
 
   try {
     // Get the current file's directory
@@ -19,16 +19,16 @@ async function initializeDatabase(): Promise<Database> {
     const dbPath = dev ? join(__dirname, '../../../donation.db') : process.env.DATABASE_PATH || 'donation.db';
     
     // Open database with promises
-    db = await open({
+    dbInstance = await open({
       filename: dbPath,
       driver: sqlite3.Database
     });
 
     // Enable foreign keys
-    await db.run('PRAGMA foreign_keys = ON');
+    await dbInstance.run('PRAGMA foreign_keys = ON');
 
     // Create tables if they don't exist
-    await db.exec(`
+    await dbInstance.exec(`
       CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         email TEXT UNIQUE NOT NULL,
@@ -72,7 +72,7 @@ async function initializeDatabase(): Promise<Database> {
       );
     `);
 
-    return db;
+    return dbInstance;
   } catch (error) {
     logger.error('Database initialization error:', error);
     throw error;

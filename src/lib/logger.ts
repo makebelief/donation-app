@@ -1,18 +1,11 @@
-import winston, { Logger } from 'winston';
+import winston from 'winston';
 import { format } from 'winston';
 
 const { combine, timestamp, json, errors, colorize, printf } = format;
 
-interface LogEntry {
-  level: string;
-  message: string;
-  timestamp: string;
-  [key: string]: any;
-}
-
 // Custom format for development
-const devFormat = printf(({ level, message, timestamp, ...metadata }: LogEntry) => {
-  let msg = `${timestamp} [${level}]: ${message}`;
+const devFormat = printf(({ level, message, timestamp, ...metadata }) => {
+  let msg = `${timestamp || ''} [${level}]: ${message}`;
   if (Object.keys(metadata).length > 0) {
     msg += ` ${JSON.stringify(metadata)}`;
   }
@@ -34,7 +27,7 @@ const developmentFormat = combine(
 );
 
 // Create the logger instance
-const logger: Logger = winston.createLogger({
+const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
   defaultMeta: { service: 'donation-app' },
   transports: [
