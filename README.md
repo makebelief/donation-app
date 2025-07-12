@@ -1,5 +1,7 @@
 # African Social Projects Donation Platform
 
+![Screenshot](./readme_preview.png)
+
 A production-ready web application built with SvelteKit, PostgreSQL, and Redis that enables secure donations to various social projects in Africa through M-Pesa integration.
 
 ## Features
